@@ -165,10 +165,14 @@ public final class TemporaryScheduleOverrideHistory {
     }
 
     private func relevantPeriod(relativeTo referenceDate: Date) -> DateInterval {
+        relevantPeriod(relativeTo: DateInterval(start: referenceDate, duration: 0))
+    }
+
+    private func relevantPeriod(relativeTo referencePeriod: DateInterval) -> DateInterval {
         let window = CarbStore.defaultMaximumAbsorptionTimeInterval
         return DateInterval(
-            start: referenceDate.addingTimeInterval(-window),
-            end: referenceDate.addingTimeInterval(window)
+            start: referencePeriod.start.addingTimeInterval(-window),
+            end: referencePeriod.end.addingTimeInterval(window)
         )
     }
 
@@ -184,7 +188,11 @@ public final class TemporaryScheduleOverrideHistory {
         }
     }
 
-    private func overridesReflectingEnabledDuration(relativeTo referenceDate: Date) -> [TemporaryScheduleOverride] {
+    func overridesReflectingEnabledDuration(relativeTo referenceDate: Date) -> [TemporaryScheduleOverride] {
+        overridesReflectingEnabledDuration(relativeTo: DateInterval(start: referenceDate, duration: 0))
+    }
+
+    func overridesReflectingEnabledDuration(relativeTo referencePeriod: DateInterval) -> [TemporaryScheduleOverride] {
         var overrides = recentEvents.filter({$0.end != .deleted}).map { event -> TemporaryScheduleOverride in
             var override = event.override
             if case .early(let endDate) = event.end {
@@ -192,7 +200,7 @@ public final class TemporaryScheduleOverrideHistory {
             }
             return override
         }
-        let period = relevantPeriod(relativeTo: referenceDate)
+        let period = relevantPeriod(relativeTo: referencePeriod)
         overrides.mutateEach { override in
             // Save the actual (computed) end date prior to modifying the start date, which shifts the whole interval
             let end = override.endDate

@@ -177,6 +177,13 @@ public final class CarbStore: HealthKitSampleStore {
     
     static let queryAnchorMetadataKey = "com.loopkit.CarbStore.queryAnchor"
 
+    func delayedAbsorptionModel(relativeTo interval: DateInterval) -> DelayedCarbAbsorptionModel {
+        DelayedCarbAbsorptionModel(
+            base: settings.absorptionModel,
+            zeroAbsorptionPeriods: overrideHistory?.zeroAbsorptionPeriods(affecting: interval) ?? []
+        )
+    }
+
     /**
      Initializes a new instance of the store.
 
@@ -403,7 +410,7 @@ extension CarbStore {
                     defaultAbsorptionTime: self.defaultAbsorptionTimes.medium,
                     delay: self.delay,
                     initialAbsorptionTimeOverrun: self.settings.initialAbsorptionTimeOverrun,
-                    absorptionModel: self.settings.absorptionModel,
+                    absorptionModel: self.delayedAbsorptionModel(relativeTo: DateInterval(start: start, end: end ?? .distantFuture)),
                     adaptiveAbsorptionRateEnabled: self.settings.adaptiveAbsorptionRateEnabled,
                     adaptiveRateStandbyIntervalFraction: self.settings.adaptiveRateStandbyIntervalFraction
                 )
@@ -837,6 +844,8 @@ extension CarbStore {
         endingAt end: Date? = nil,
         effectVelocities: [GlucoseEffectVelocity]? = nil
     ) -> [CarbValue] {
+        let delayedAbsorptionModel = self.delayedAbsorptionModel(relativeTo: DateInterval(start: start, end: end ?? .distantFuture))
+
         if  let velocities = effectVelocities,
             let carbRatioSchedule = carbRatioScheduleApplyingOverrideHistory,
             let insulinSensitivitySchedule = insulinSensitivityScheduleApplyingOverrideHistory
@@ -849,14 +858,14 @@ extension CarbStore {
                 defaultAbsorptionTime: defaultAbsorptionTimes.medium,
                 delay: delay,
                 initialAbsorptionTimeOverrun: settings.initialAbsorptionTimeOverrun,
-                absorptionModel: settings.absorptionModel,
+                absorptionModel: delayedAbsorptionModel,
                 adaptiveAbsorptionRateEnabled: settings.adaptiveAbsorptionRateEnabled,
                 adaptiveRateStandbyIntervalFraction: settings.adaptiveRateStandbyIntervalFraction
             ).dynamicCarbsOnBoard(
                 from: start,
                 to: end,
                 defaultAbsorptionTime: defaultAbsorptionTimes.medium,
-                absorptionModel: settings.absorptionModel,
+                absorptionModel: delayedAbsorptionModel,
                 delay: delay,
                 delta: delta
             )
@@ -865,7 +874,7 @@ extension CarbStore {
                 from: start,
                 to: end,
                 defaultAbsorptionTime: defaultAbsorptionTimes.medium,
-                absorptionModel: settings.absorptionModel,
+                absorptionModel: delayedAbsorptionModel,
                 delay: delay,
                 delta: delta
             )
@@ -943,6 +952,8 @@ extension CarbStore {
             throw CarbStoreError.notConfigured
         }
 
+        let delayedAbsorptionModel = self.delayedAbsorptionModel(relativeTo: DateInterval(start: start, end: end ?? .distantFuture))
+
         if let effectVelocities = effectVelocities {
             return samples.map(
                 to: effectVelocities,
@@ -952,7 +963,7 @@ extension CarbStore {
                 defaultAbsorptionTime: defaultAbsorptionTimes.medium,
                 delay: delay,
                 initialAbsorptionTimeOverrun: settings.initialAbsorptionTimeOverrun,
-                absorptionModel: settings.absorptionModel,
+                absorptionModel: delayedAbsorptionModel,
                 adaptiveAbsorptionRateEnabled: settings.adaptiveAbsorptionRateEnabled,
                 adaptiveRateStandbyIntervalFraction: settings.adaptiveRateStandbyIntervalFraction
             ).dynamicGlucoseEffects(
@@ -961,7 +972,7 @@ extension CarbStore {
                 carbRatios: carbRatioSchedule,
                 insulinSensitivities: insulinSensitivitySchedule,
                 defaultAbsorptionTime: defaultAbsorptionTimes.medium,
-                absorptionModel: settings.absorptionModel,
+                absorptionModel: delayedAbsorptionModel,
                 delay: delay,
                 delta: delta
             )
@@ -972,7 +983,7 @@ extension CarbStore {
                 carbRatios: carbRatioSchedule,
                 insulinSensitivities: insulinSensitivitySchedule,
                 defaultAbsorptionTime: defaultAbsorptionTimes.medium,
-                absorptionModel: settings.absorptionModel,
+                absorptionModel: delayedAbsorptionModel,
                 delay: delay,
                 delta: delta
             )
@@ -1072,5 +1083,12 @@ extension CarbStore {
 
             completionHandler(report.joined(separator: "\n"))
         }
+    }
+}
+
+extension TemporaryScheduleOverrideHistory {
+    func zeroAbsorptionPeriods(affecting interval: DateInterval) -> [DateInterval] {
+        // TODO: only "exercise" overrides
+        overridesReflectingEnabledDuration(relativeTo: interval).map { $0.activeInterval }
     }
 }

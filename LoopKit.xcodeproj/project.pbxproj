@@ -368,6 +368,10 @@
 		898E6E732241EE000019E459 /* Comparable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 892A5DBB2231E20C008961AB /* Comparable.swift */; };
 		8992426521EC138000EA512B /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8992426421EC138000EA512B /* UIColor.swift */; };
 		8997B4F523727E8A00061132 /* CustomOverrideCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8997B4F423727E8A00061132 /* CustomOverrideCollectionViewCell.swift */; };
+		89A5DE6D248D8D7000C230DC /* Exercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89A5DE6C248D8D7000C230DC /* Exercise.swift */; };
+		89A5DE6E248DA53300C230DC /* Comparable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 892A5DBB2231E20C008961AB /* Comparable.swift */; };
+		89A5DE6F248DA53500C230DC /* Comparable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 892A5DBB2231E20C008961AB /* Comparable.swift */; };
+		89A5DE71248DB8E300C230DC /* DelayedCarbAbsorptionCurveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89A5DE70248DB8E300C230DC /* DelayedCarbAbsorptionCurveTests.swift */; };
 		89ADE129226BDB280067222B /* TestingScenario.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89ADE128226BDB280067222B /* TestingScenario.swift */; };
 		89ADE12B226BDB730067222B /* DateRelativeCarbEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89ADE12A226BDB730067222B /* DateRelativeCarbEntry.swift */; };
 		89ADE12D226BDD190067222B /* DateRelativeBasalEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89ADE12C226BDD190067222B /* DateRelativeBasalEntry.swift */; };
@@ -1101,6 +1105,8 @@
 		898E6E712241EDC10019E459 /* DateAndDurationTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateAndDurationTableViewController.swift; sourceTree = "<group>"; };
 		8992426421EC138000EA512B /* UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
 		8997B4F423727E8A00061132 /* CustomOverrideCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomOverrideCollectionViewCell.swift; sourceTree = "<group>"; };
+		89A5DE6C248D8D7000C230DC /* Exercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercise.swift; sourceTree = "<group>"; };
+		89A5DE70248DB8E300C230DC /* DelayedCarbAbsorptionCurveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelayedCarbAbsorptionCurveTests.swift; sourceTree = "<group>"; };
 		89AB9EC621A4774500351324 /* MockPumpManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockPumpManager.swift; sourceTree = "<group>"; };
 		89AB9EC821A4BC2400351324 /* MockCGMManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockCGMManager.swift; sourceTree = "<group>"; };
 		89AB9ECA21A4C36200351324 /* MockPumpManager+UI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MockPumpManager+UI.swift"; sourceTree = "<group>"; };
@@ -1554,6 +1560,7 @@
 		43D8FDCD1C728FDF0073BE78 /* LoopKit */ = {
 			isa = PBXGroup;
 			children = (
+				89A5DE6B248D8D6300C230DC /* Exercise */,
 				C18A418924281C5B00BBAF28 /* DeviceManager */,
 				43D8FDCE1C728FDF0073BE78 /* LoopKit.h */,
 				43D8FDD01C728FDF0073BE78 /* Info.plist */,
@@ -1610,6 +1617,7 @@
 				43D8FE411C7291900073BE78 /* CarbMathTests.swift */,
 				437AFF192039F149008C4892 /* CarbStoreTests.swift */,
 				891A3FD6224BE62100378B27 /* DailyValueScheduleTests.swift */,
+				89A5DE70248DB8E300C230DC /* DelayedCarbAbsorptionCurveTests.swift */,
 				43A067121F245A2F00E9E90F /* DoseStoreTests.swift */,
 				43D8FE991C7293D00073BE78 /* GlucoseMathTests.swift */,
 				43D8FEC81C7294640073BE78 /* InsulinMathTests.swift */,
@@ -1844,6 +1852,14 @@
 				8992426421EC138000EA512B /* UIColor.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		89A5DE6B248D8D6300C230DC /* Exercise */ = {
+			isa = PBXGroup;
+			children = (
+				89A5DE6C248D8D7000C230DC /* Exercise.swift */,
+			);
+			path = Exercise;
 			sourceTree = "<group>";
 		};
 		89D2047321CC7BD7001238CC /* MockKit */ = {
@@ -2551,6 +2567,7 @@
 				43D8FDF71C7290350073BE78 /* DailyValueSchedule.swift in Sources */,
 				4322B77D202FA2AF0002837D /* NewPumpEvent.swift in Sources */,
 				434113AA20F171CB00D05747 /* CachedInsulinDeliveryObject+CoreDataClass.swift in Sources */,
+				89A5DE6D248D8D7000C230DC /* Exercise.swift in Sources */,
 				432CF86F20D76CCF0066B889 /* GlucoseTrend.swift in Sources */,
 				43FB60E920DCBE64002B996B /* PumpManagerStatus.swift in Sources */,
 				4322B774202FA2790002837D /* CarbMath.swift in Sources */,
@@ -2612,6 +2629,7 @@
 				89F53E9422B4328E0024A67C /* MutableCollection.swift in Sources */,
 				C18A419524281CAD00BBAF28 /* DeviceLogEntryType.swift in Sources */,
 				433BC7A720523DB7000B1200 /* NewGlucoseSample.swift in Sources */,
+				89A5DE6E248DA53300C230DC /* Comparable.swift in Sources */,
 				4322B78E202FA2B30002837D /* InsulinMath.swift in Sources */,
 				43B17C89208EEC0B00AC27E9 /* HealthStoreUnitCache.swift in Sources */,
 				89AE222E228BC68000BDFD85 /* DoseProgressReporter.swift in Sources */,
@@ -2670,6 +2688,7 @@
 				434113BA20F2C41C00D05747 /* DeletedCarbObjectTests.swift in Sources */,
 				437874B5202FDD1200A3D8B9 /* DoseStoreTests.swift in Sources */,
 				4322B76C202F9ECD0002837D /* CarbMathTests.swift in Sources */,
+				89A5DE71248DB8E300C230DC /* DelayedCarbAbsorptionCurveTests.swift in Sources */,
 				434113B520F2BDB500D05747 /* CachedInsulinDeliveryObjectTests.swift in Sources */,
 				43D8FE1F1C72906E0073BE78 /* QuantityScheduleTests.swift in Sources */,
 				437AFF1A2039F149008C4892 /* CarbStoreTests.swift in Sources */,
@@ -2813,6 +2832,7 @@
 				A9E675A722713F4700E25293 /* DoseStore.swift in Sources */,
 				A9E675A822713F4700E25293 /* TimeZone.swift in Sources */,
 				A9E675A922713F4700E25293 /* PumpEvent+CoreDataProperties.swift in Sources */,
+				89A5DE6F248DA53500C230DC /* Comparable.swift in Sources */,
 				A9E675AA22713F4700E25293 /* ReservoirValue.swift in Sources */,
 				A9E675AB22713F4700E25293 /* HKHealthStore.swift in Sources */,
 				A9E675AC22713F4700E25293 /* Reservoir.swift in Sources */,
