@@ -1,5 +1,5 @@
 //
-//  Exercise.swift
+//  DelayedCarbAbsorptionModel.swift
 //  LoopKit
 //
 //  Created by Michael Pangburn on 6/7/20.
@@ -22,6 +22,10 @@ struct DelayedCarbAbsorptionModel {
     }
 
     func percentAbsorption(at date: Date, relativeTo absorptionInterval: DateInterval) -> Double {
+        guard date > absorptionInterval.start else {
+            return 0
+        }
+
         let delay = accumulatedDelay(over: DateInterval(start: absorptionInterval.start, end: date))
         let delayedPercentTime = date.fractionThrough(absorptionInterval) - delay / absorptionInterval.duration
         return base.percentAbsorptionAtPercentTime(delayedPercentTime)

@@ -108,6 +108,17 @@ public final class DoseStore {
     /// A history of recently applied schedule overrides.
     private let overrideHistory: TemporaryScheduleOverrideHistory?
 
+    private func variableInsulinModel(relativeTo interval: DateInterval) -> VariableInsulinModel? {
+        guard let insulinModel = insulinModel else {
+            return nil
+        }
+
+        return VariableInsulinModel(
+            base: insulinModel,
+            variableEffectTimeline: overrideHistory?.variableInsulinEffectTimeline(relativeTo: interval) ?? []
+        )
+    }
+
     public var basalProfile: BasalRateSchedule? {
         get {
             return lockedBasalProfile.value
@@ -1219,13 +1230,13 @@ extension DoseStore {
     ///   - completion: A closure called once the values have been retrieved
     ///   - result: An array of insulin values, in chronological order
     public func getInsulinOnBoardValues(start: Date, end: Date? = nil, basalDosingEnd: Date? = nil, completion: @escaping (_ result: DoseStoreResult<[InsulinValue]>) -> Void) {
-        guard let insulinModel = self.insulinModel else {
+        guard let insulinModel = variableInsulinModel(relativeTo: DateInterval(start: start, end: end ?? .distantFuture)) else {
             completion(.failure(.configurationError))
             return
         }
 
         // To properly know IOB at startDate, we need to go back another DIA hours
-        let doseStart = start.addingTimeInterval(-insulinModel.effectDuration)
+        let doseStart = start.addingTimeInterval(-insulinModel.base.effectDuration)
         getNormalizedDoseEntries(start: doseStart, end: end) { (result) in
             switch result {
             case .failure(let error):
@@ -1249,7 +1260,7 @@ extension DoseStore {
     ///   - completion: A closure called once the effects have been retrieved
     ///   - result: An array of effects, in chronological order
     public func getGlucoseEffects(start: Date, end: Date? = nil, basalDosingEnd: Date? = Date(), completion: @escaping (_ result: DoseStoreResult<[GlucoseEffect]>) -> Void) {
-        guard let insulinModel = self.insulinModel,
+        guard let insulinModel = variableInsulinModel(relativeTo: DateInterval(start: start, end: end ?? .distantFuture)),
               let insulinSensitivitySchedule = self.insulinSensitivityScheduleApplyingOverrideHistory
         else {
             completion(.failure(.configurationError))
@@ -1257,7 +1268,7 @@ extension DoseStore {
         }
 
         // To properly know glucose effects at startDate, we need to go back another DIA hours
-        let doseStart = start.addingTimeInterval(-insulinModel.effectDuration)
+        let doseStart = start.addingTimeInterval(-insulinModel.base.effectDuration)
         getNormalizedDoseEntries(start: doseStart, end: end) { (result) in
             switch result {
             case .failure(let error):
@@ -1425,6 +1436,18 @@ extension DoseStore {
                     }
                 }
             }
+        }
+    }
+}
+
+extension TemporaryScheduleOverrideHistory {
+    public func variableInsulinEffectTimeline(relativeTo interval: DateInterval) -> [(interval: DateInterval, rate: Double)] {
+        overridesReflectingEnabledDuration(relativeTo: interval).compactMap { override in
+            guard override.settings.effectiveInsulinNeedsScaleFactor <= 1 else {
+                return nil
+            }
+
+            return (interval: override.activeInterval, rate: 1.3)
         }
     }
 }

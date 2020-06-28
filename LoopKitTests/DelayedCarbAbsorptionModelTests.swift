@@ -1,5 +1,5 @@
 //
-//  DelayedCarbAbsorptionCurveTests.swift
+//  DelayedCarbAbsorptionModelTests.swift
 //  LoopKitTests
 //
 //  Created by Michael Pangburn on 6/7/20.
@@ -10,7 +10,7 @@ import XCTest
 @testable import LoopKit
 
 
-final class DelayedCarbAbsorptionCurveTests: XCTestCase {
+final class DelayedCarbAbsorptionModelTests: XCTestCase {
     let epsilon = 1e-9
 
     func testPercentAbsorption() {

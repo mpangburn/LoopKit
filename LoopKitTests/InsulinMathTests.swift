@@ -237,7 +237,7 @@ class InsulinMathTests: XCTestCase {
             XCTAssertEqual(expected.value, calculated.netBasalUnitsPerHour, accuracy: Double(Float.ulpOfOne))
         }
 
-        let iob = normalized.insulinOnBoard(model: insulinModel)
+        let iob = normalized.insulinOnBoard(model: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []))
 
         XCTAssertEqual(iobOutput.count, iob.count)
 
@@ -253,10 +253,10 @@ class InsulinMathTests: XCTestCase {
         let insulinModel = WalshInsulinModel(actionDuration: TimeInterval(hours: 4))
 
         measure {
-            _ = input.insulinOnBoard(model: insulinModel)
+            _ = input.insulinOnBoard(model: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []))
         }
 
-        let iob = input.insulinOnBoard(model: insulinModel)
+        let iob = input.insulinOnBoard(model: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []))
 
         XCTAssertEqual(output.count, iob.count)
 
@@ -270,7 +270,7 @@ class InsulinMathTests: XCTestCase {
         let input: [DoseEntry] = []
         let insulinModel = WalshInsulinModel(actionDuration: TimeInterval(hours: 4))
 
-        let iob = input.insulinOnBoard(model: insulinModel)
+        let iob = input.insulinOnBoard(model: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []))
 
         XCTAssertEqual(0, iob.count)
     }
@@ -294,10 +294,10 @@ class InsulinMathTests: XCTestCase {
         let insulinModel = ExponentialInsulinModel(actionDuration: TimeInterval(minutes: 360), peakActivityTime: TimeInterval(minutes: 75))
         
         measure {
-            _ = input.insulinOnBoard(model: insulinModel)
+            _ = input.insulinOnBoard(model: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []))
         }
         
-        let iob = input.insulinOnBoard(model: insulinModel)
+        let iob = input.insulinOnBoard(model: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []))
         
         XCTAssertEqual(output.count, iob.count)
         
@@ -313,7 +313,7 @@ class InsulinMathTests: XCTestCase {
         let insulinModel = ExponentialInsulinModel(actionDuration: TimeInterval(minutes: 360), peakActivityTime: TimeInterval(minutes: 75))
         let output = loadInsulinValueFixture("iob_from_bolus_exponential_output")
         
-        let iob = input.insulinOnBoard(model: insulinModel)
+        let iob = input.insulinOnBoard(model: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []))
         
         XCTAssertEqual(output.count, iob.count)
         
@@ -332,7 +332,7 @@ class InsulinMathTests: XCTestCase {
             let insulinModel = WalshInsulinModel(actionDuration: actionDuration)
             let output = loadInsulinValueFixture("iob_from_bolus_\(Int(actionDuration.minutes))min_output")
 
-            let iob = input.insulinOnBoard(model: insulinModel)
+            let iob = input.insulinOnBoard(model: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []))
 
             XCTAssertEqual(output.count, iob.count)
 
@@ -349,10 +349,10 @@ class InsulinMathTests: XCTestCase {
         let insulinModel = WalshInsulinModel(actionDuration: TimeInterval(hours: 4))
 
         measure {
-            _ = input.insulinOnBoard(model: insulinModel)
+            _ = input.insulinOnBoard(model: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []))
         }
 
-        let iob = input.insulinOnBoard(model: insulinModel)
+        let iob = input.insulinOnBoard(model: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []))
 
         XCTAssertEqual(output.count, iob.count)
 
@@ -452,10 +452,10 @@ class InsulinMathTests: XCTestCase {
         let insulinModel = WalshInsulinModel(actionDuration: TimeInterval(hours: 4))
 
         measure {
-            _ = input.glucoseEffects(insulinModel: insulinModel, insulinSensitivity: insulinSensitivitySchedule)
+            _ = input.glucoseEffects(insulinModel: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []), insulinSensitivity: insulinSensitivitySchedule)
         }
 
-        let effects = input.glucoseEffects(insulinModel: insulinModel, insulinSensitivity: insulinSensitivitySchedule)
+        let effects = input.glucoseEffects(insulinModel: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []), insulinSensitivity: insulinSensitivitySchedule)
 
         XCTAssertEqual(Float(output.count), Float(effects.count), accuracy: 1.0)
 
@@ -472,10 +472,10 @@ class InsulinMathTests: XCTestCase {
         let insulinModel = WalshInsulinModel(actionDuration: TimeInterval(hours: 4))
 
         measure {
-            _ = input.glucoseEffects(insulinModel: insulinModel, insulinSensitivity: insulinSensitivitySchedule)
+            _ = input.glucoseEffects(insulinModel: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []), insulinSensitivity: insulinSensitivitySchedule)
         }
 
-        let effects = input.glucoseEffects(insulinModel: insulinModel, insulinSensitivity: insulinSensitivitySchedule)
+        let effects = input.glucoseEffects(insulinModel: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []), insulinSensitivity: insulinSensitivitySchedule)
 
         XCTAssertEqual(output.count, effects.count)
 
@@ -492,10 +492,10 @@ class InsulinMathTests: XCTestCase {
         let insulinModel = WalshInsulinModel(actionDuration: TimeInterval(hours: 4))
 
         measure {
-            _ = input.glucoseEffects(insulinModel: insulinModel, insulinSensitivity: insulinSensitivitySchedule)
+            _ = input.glucoseEffects(insulinModel: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []), insulinSensitivity: insulinSensitivitySchedule)
         }
 
-        let effects = input.glucoseEffects(insulinModel: insulinModel, insulinSensitivity: insulinSensitivitySchedule)
+        let effects = input.glucoseEffects(insulinModel: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []), insulinSensitivity: insulinSensitivitySchedule)
 
         XCTAssertEqual(output.count, effects.count)
 
@@ -512,10 +512,10 @@ class InsulinMathTests: XCTestCase {
         let insulinModel = WalshInsulinModel(actionDuration: TimeInterval(hours: 4))
 
         measure {
-            _ = input.glucoseEffects(insulinModel: insulinModel, insulinSensitivity: insulinSensitivitySchedule)
+            _ = input.glucoseEffects(insulinModel: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []), insulinSensitivity: insulinSensitivitySchedule)
         }
 
-        let effects = input.glucoseEffects(insulinModel: insulinModel, insulinSensitivity: insulinSensitivitySchedule)
+        let effects = input.glucoseEffects(insulinModel: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []), insulinSensitivity: insulinSensitivitySchedule)
 
         XCTAssertEqual(output.count, effects.count)
 
@@ -530,7 +530,7 @@ class InsulinMathTests: XCTestCase {
         let insulinSensitivitySchedule = self.insulinSensitivitySchedule
         let insulinModel = WalshInsulinModel(actionDuration: TimeInterval(hours: 4))
 
-        let effects = input.glucoseEffects(insulinModel: insulinModel, insulinSensitivity: insulinSensitivitySchedule)
+        let effects = input.glucoseEffects(insulinModel: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []), insulinSensitivity: insulinSensitivitySchedule)
 
         XCTAssertEqual(0, effects.count)
     }
@@ -989,16 +989,16 @@ class InsulinMathTests: XCTestCase {
         let date = f("2018-07-16 03:40:00 +0000")
 
         XCTAssertEqual(
-            normalizedDoseEntries.insulinOnBoard(model: insulinModel, from: date, to: date).first!.value,
-            appended.insulinOnBoard(model: insulinModel, from: date, to: date).first!.value,
+            normalizedDoseEntries.insulinOnBoard(model: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []), from: date, to: date).first!.value,
+            appended.insulinOnBoard(model: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []), from: date, to: date).first!.value,
             accuracy: 1.0/40
         )
 
         let emptyCacheAppended = ([DoseEntry]()).appendedUnion(with: normalizedDoseEntries)
 
         XCTAssertEqual(
-            normalizedDoseEntries.insulinOnBoard(model: insulinModel, from: date, to: date).first!.value,
-            emptyCacheAppended.insulinOnBoard(model: insulinModel, from: date, to: date).first!.value,
+            normalizedDoseEntries.insulinOnBoard(model: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []), from: date, to: date).first!.value,
+            emptyCacheAppended.insulinOnBoard(model: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []), from: date, to: date).first!.value,
             accuracy: 1.0/40,
             "Empty cache doesn't affect outcome"
         )
@@ -1006,8 +1006,8 @@ class InsulinMathTests: XCTestCase {
         let fullCache = cachedDoseEntries.appendedUnion(with: [])
 
         XCTAssertEqual(
-            cachedDoseEntries.insulinOnBoard(model: insulinModel, from: date, to: date).first!.value,
-            fullCache.insulinOnBoard(model: insulinModel, from: date, to: date).first!.value,
+            cachedDoseEntries.insulinOnBoard(model: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []), from: date, to: date).first!.value,
+            fullCache.insulinOnBoard(model: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []), from: date, to: date).first!.value,
             accuracy: 1.0/40,
             "Only cache doesn't affect outcome"
         )
@@ -1062,8 +1062,8 @@ class InsulinMathTests: XCTestCase {
         let date = f("2018-07-16 05:30:00 +0000")
 
         XCTAssertEqual(
-            normalizedReservoirDoseEntries.insulinOnBoard(model: insulinModel, from: date, to: date).first!.value,
-            appended.insulinOnBoard(model: insulinModel, from: date, to: date).first!.value,
+            normalizedReservoirDoseEntries.insulinOnBoard(model: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []), from: date, to: date).first!.value,
+            appended.insulinOnBoard(model: VariableInsulinModel(base: insulinModel, variableEffectTimeline: []), from: date, to: date).first!.value,
             accuracy: 0.1
         )
     }

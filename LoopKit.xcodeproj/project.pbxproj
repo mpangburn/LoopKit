@@ -368,10 +368,14 @@
 		898E6E732241EE000019E459 /* Comparable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 892A5DBB2231E20C008961AB /* Comparable.swift */; };
 		8992426521EC138000EA512B /* UIColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8992426421EC138000EA512B /* UIColor.swift */; };
 		8997B4F523727E8A00061132 /* CustomOverrideCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8997B4F423727E8A00061132 /* CustomOverrideCollectionViewCell.swift */; };
-		89A5DE6D248D8D7000C230DC /* Exercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89A5DE6C248D8D7000C230DC /* Exercise.swift */; };
+		89A5DE6D248D8D7000C230DC /* DelayedCarbAbsorptionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89A5DE6C248D8D7000C230DC /* DelayedCarbAbsorptionModel.swift */; };
 		89A5DE6E248DA53300C230DC /* Comparable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 892A5DBB2231E20C008961AB /* Comparable.swift */; };
 		89A5DE6F248DA53500C230DC /* Comparable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 892A5DBB2231E20C008961AB /* Comparable.swift */; };
-		89A5DE71248DB8E300C230DC /* DelayedCarbAbsorptionCurveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89A5DE70248DB8E300C230DC /* DelayedCarbAbsorptionCurveTests.swift */; };
+		89A5DE71248DB8E300C230DC /* DelayedCarbAbsorptionModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89A5DE70248DB8E300C230DC /* DelayedCarbAbsorptionModelTests.swift */; };
+		89A5DE72248ECF9900C230DC /* DelayedCarbAbsorptionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89A5DE6C248D8D7000C230DC /* DelayedCarbAbsorptionModel.swift */; };
+		89A5DE74248EE06700C230DC /* VariableInsulinModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89A5DE73248EE06600C230DC /* VariableInsulinModel.swift */; };
+		89A5DE75248EF3A100C230DC /* VariableInsulinModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89A5DE73248EE06600C230DC /* VariableInsulinModel.swift */; };
+		89A5DE772490319700C230DC /* VariableInsulinModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89A5DE762490319700C230DC /* VariableInsulinModelTests.swift */; };
 		89ADE129226BDB280067222B /* TestingScenario.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89ADE128226BDB280067222B /* TestingScenario.swift */; };
 		89ADE12B226BDB730067222B /* DateRelativeCarbEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89ADE12A226BDB730067222B /* DateRelativeCarbEntry.swift */; };
 		89ADE12D226BDD190067222B /* DateRelativeBasalEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89ADE12C226BDD190067222B /* DateRelativeBasalEntry.swift */; };
@@ -1105,8 +1109,10 @@
 		898E6E712241EDC10019E459 /* DateAndDurationTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateAndDurationTableViewController.swift; sourceTree = "<group>"; };
 		8992426421EC138000EA512B /* UIColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColor.swift; sourceTree = "<group>"; };
 		8997B4F423727E8A00061132 /* CustomOverrideCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomOverrideCollectionViewCell.swift; sourceTree = "<group>"; };
-		89A5DE6C248D8D7000C230DC /* Exercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercise.swift; sourceTree = "<group>"; };
-		89A5DE70248DB8E300C230DC /* DelayedCarbAbsorptionCurveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelayedCarbAbsorptionCurveTests.swift; sourceTree = "<group>"; };
+		89A5DE6C248D8D7000C230DC /* DelayedCarbAbsorptionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelayedCarbAbsorptionModel.swift; sourceTree = "<group>"; };
+		89A5DE70248DB8E300C230DC /* DelayedCarbAbsorptionModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelayedCarbAbsorptionModelTests.swift; sourceTree = "<group>"; };
+		89A5DE73248EE06600C230DC /* VariableInsulinModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariableInsulinModel.swift; sourceTree = "<group>"; };
+		89A5DE762490319700C230DC /* VariableInsulinModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariableInsulinModelTests.swift; sourceTree = "<group>"; };
 		89AB9EC621A4774500351324 /* MockPumpManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockPumpManager.swift; sourceTree = "<group>"; };
 		89AB9EC821A4BC2400351324 /* MockCGMManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockCGMManager.swift; sourceTree = "<group>"; };
 		89AB9ECA21A4C36200351324 /* MockPumpManager+UI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MockPumpManager+UI.swift"; sourceTree = "<group>"; };
@@ -1617,7 +1623,7 @@
 				43D8FE411C7291900073BE78 /* CarbMathTests.swift */,
 				437AFF192039F149008C4892 /* CarbStoreTests.swift */,
 				891A3FD6224BE62100378B27 /* DailyValueScheduleTests.swift */,
-				89A5DE70248DB8E300C230DC /* DelayedCarbAbsorptionCurveTests.swift */,
+				89A5DE70248DB8E300C230DC /* DelayedCarbAbsorptionModelTests.swift */,
 				43A067121F245A2F00E9E90F /* DoseStoreTests.swift */,
 				43D8FE991C7293D00073BE78 /* GlucoseMathTests.swift */,
 				43D8FEC81C7294640073BE78 /* InsulinMathTests.swift */,
@@ -1628,6 +1634,7 @@
 				891A3FD02249948A00378B27 /* TemporaryScheduleOverrideHistoryTests.swift */,
 				434C5F9F209ABD4700B2FD1A /* QuantityFormatterTests.swift */,
 				43D8FE1C1C72906E0073BE78 /* QuantityScheduleTests.swift */,
+				89A5DE762490319700C230DC /* VariableInsulinModelTests.swift */,
 			);
 			path = LoopKitTests;
 			sourceTree = "<group>";
@@ -1857,7 +1864,8 @@
 		89A5DE6B248D8D6300C230DC /* Exercise */ = {
 			isa = PBXGroup;
 			children = (
-				89A5DE6C248D8D7000C230DC /* Exercise.swift */,
+				89A5DE6C248D8D7000C230DC /* DelayedCarbAbsorptionModel.swift */,
+				89A5DE73248EE06600C230DC /* VariableInsulinModel.swift */,
 			);
 			path = Exercise;
 			sourceTree = "<group>";
@@ -2567,7 +2575,7 @@
 				43D8FDF71C7290350073BE78 /* DailyValueSchedule.swift in Sources */,
 				4322B77D202FA2AF0002837D /* NewPumpEvent.swift in Sources */,
 				434113AA20F171CB00D05747 /* CachedInsulinDeliveryObject+CoreDataClass.swift in Sources */,
-				89A5DE6D248D8D7000C230DC /* Exercise.swift in Sources */,
+				89A5DE6D248D8D7000C230DC /* DelayedCarbAbsorptionModel.swift in Sources */,
 				432CF86F20D76CCF0066B889 /* GlucoseTrend.swift in Sources */,
 				43FB60E920DCBE64002B996B /* PumpManagerStatus.swift in Sources */,
 				4322B774202FA2790002837D /* CarbMath.swift in Sources */,
@@ -2607,6 +2615,7 @@
 				437AFEF02036A156008C4892 /* DeletedCarbObject+CoreDataProperties.swift in Sources */,
 				4322B777202FA2790002837D /* CarbValue.swift in Sources */,
 				4322B782202FA2AF0002837D /* PumpEventType.swift in Sources */,
+				89A5DE74248EE06700C230DC /* VariableInsulinModel.swift in Sources */,
 				4322B77C202FA2A60002837D /* NSData.swift in Sources */,
 				89AE2228228BC54C00BDFD85 /* TemporaryScheduleOverrideSettings.swift in Sources */,
 				43D8FDFA1C7290350073BE78 /* GlucoseRangeSchedule.swift in Sources */,
@@ -2681,6 +2690,7 @@
 				437AFF21203AA740008C4892 /* NSManagedObjectContext.swift in Sources */,
 				434C5FA1209AC4EE00B2FD1A /* HKUnit.swift in Sources */,
 				437AFF1F203A763F008C4892 /* HKHealthStoreMock.swift in Sources */,
+				89A5DE772490319700C230DC /* VariableInsulinModelTests.swift in Sources */,
 				891A3FD32249990900378B27 /* DailyValueSchedule.swift in Sources */,
 				434C5FA0209ABD4700B2FD1A /* QuantityFormatterTests.swift in Sources */,
 				43D8FE1E1C72906E0073BE78 /* NSDateTests.swift in Sources */,
@@ -2688,7 +2698,7 @@
 				434113BA20F2C41C00D05747 /* DeletedCarbObjectTests.swift in Sources */,
 				437874B5202FDD1200A3D8B9 /* DoseStoreTests.swift in Sources */,
 				4322B76C202F9ECD0002837D /* CarbMathTests.swift in Sources */,
-				89A5DE71248DB8E300C230DC /* DelayedCarbAbsorptionCurveTests.swift in Sources */,
+				89A5DE71248DB8E300C230DC /* DelayedCarbAbsorptionModelTests.swift in Sources */,
 				434113B520F2BDB500D05747 /* CachedInsulinDeliveryObjectTests.swift in Sources */,
 				43D8FE1F1C72906E0073BE78 /* QuantityScheduleTests.swift in Sources */,
 				437AFF1A2039F149008C4892 /* CarbStoreTests.swift in Sources */,
@@ -2796,8 +2806,10 @@
 				A9E6758522713F4700E25293 /* GlucoseMath.swift in Sources */,
 				A9E6758622713F4700E25293 /* Model.xcdatamodeld in Sources */,
 				A9E6758722713F4700E25293 /* CarbEntry.swift in Sources */,
+				89A5DE72248ECF9900C230DC /* DelayedCarbAbsorptionModel.swift in Sources */,
 				A9E6758822713F4700E25293 /* HealthKitSampleStore.swift in Sources */,
 				89AE223D228BCB0B00BDFD85 /* Collection.swift in Sources */,
+				89A5DE75248EF3A100C230DC /* VariableInsulinModel.swift in Sources */,
 				A9E6758A22713F4700E25293 /* DeletedCarbEntry.swift in Sources */,
 				A9E6758B22713F4700E25293 /* OSLog.swift in Sources */,
 				A9E6758C22713F4700E25293 /* DoseType.swift in Sources */,

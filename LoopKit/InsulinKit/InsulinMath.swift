@@ -11,74 +11,78 @@ import HealthKit
 
 
 extension DoseEntry {
-    private func continuousDeliveryInsulinOnBoard(at date: Date, model: InsulinModel, delta: TimeInterval) -> Double {
-        let doseDuration = endDate.timeIntervalSince(startDate)  // t1
-        let time = date.timeIntervalSince(startDate)
+    private func continuousDeliveryInsulinOnBoard(at date: Date, model: VariableInsulinModel, delta: TimeInterval) -> Double {
+        let doseDuration = endDate.timeIntervalSince(startDate)
         var iob: Double = 0
-        var doseDate = TimeInterval(0)  // i
+        var doseDate = startDate
 
         repeat {
-            let segment: Double
-
-            if doseDuration > 0 {
-                segment = max(0, min(doseDate + delta, doseDuration) - doseDate) / doseDuration
-            } else {
-                segment = 1
-            }
-
-            iob += segment * model.percentEffectRemaining(at: time - doseDate)
-            doseDate += delta
-        } while doseDate <= min(floor((time + model.delay) / delta) * delta, doseDuration)
+            let deltaInterval = DateInterval(start: doseDate, end: min(doseDate.addingTimeInterval(delta), endDate))
+            let segmentWidth = doseDuration > 0 ? deltaInterval.duration / doseDuration : 1
+            iob += segmentWidth * model.percentEffectRemaining(after: DateInterval(start: startDate, duration: max(date.timeIntervalSince(doseDate), 0)))
+            doseDate = doseDate.addingTimeInterval(delta)
+        } while doseDate <= min(date.addingTimeInterval(model.base.delay).dateFlooredToTimeInterval(delta), endDate)
 
         return iob
     }
 
-    func insulinOnBoard(at date: Date, model: InsulinModel, delta: TimeInterval) -> Double {
-        let time = date.timeIntervalSince(startDate)
-        guard time >= 0 else {
+    func insulinOnBoard(at date: Date, model: VariableInsulinModel, delta: TimeInterval) -> Double {
+        guard date.timeIntervalSince(startDate) >= 0 else {
             return 0
         }
 
         // Consider doses within the delta time window as momentary
         if endDate.timeIntervalSince(startDate) <= 1.05 * delta {
-            return netBasalUnits * model.percentEffectRemaining(at: time)
+            return netBasalUnits * model.percentEffectRemaining(after: DateInterval(start: startDate, end: date))
         } else {
             return netBasalUnits * continuousDeliveryInsulinOnBoard(at: date, model: model, delta: delta)
         }
     }
 
-    private func continuousDeliveryGlucoseEffect(at date: Date, model: InsulinModel, delta: TimeInterval) -> Double {
+    private func continuousDeliveryGlucoseEffect(at date: Date, model: VariableInsulinModel, delta: TimeInterval) -> Double {
+//        let doseDuration = endDate.timeIntervalSince(startDate)  // t1
+//        let time = date.timeIntervalSince(startDate)
+//        var value: Double = 0
+//        var doseDate = TimeInterval(0)  // i
+//
+//        repeat {
+//            let segment: Double
+//
+//            if doseDuration > 0 {
+//                segment = max(0, min(doseDate + delta, doseDuration) - doseDate) / doseDuration
+//            } else {
+//                segment = 1
+//            }
+//
+//            value += segment * (1.0 - model.percentEffectRemaining(at: time - doseDate))
+//            doseDate += delta
+//        } while doseDate <= min(floor((time + model.delay) / delta) * delta, doseDuration)
+//
+//        return value
+
         let doseDuration = endDate.timeIntervalSince(startDate)  // t1
-        let time = date.timeIntervalSince(startDate)
         var value: Double = 0
-        var doseDate = TimeInterval(0)  // i
+        var doseDate = startDate
 
         repeat {
-            let segment: Double
-
-            if doseDuration > 0 {
-                segment = max(0, min(doseDate + delta, doseDuration) - doseDate) / doseDuration
-            } else {
-                segment = 1
-            }
-
-            value += segment * (1.0 - model.percentEffectRemaining(at: time - doseDate))
-            doseDate += delta
-        } while doseDate <= min(floor((time + model.delay) / delta) * delta, doseDuration)
+            // TODO: is this actually equivalent?
+            let deltaInterval = DateInterval(start: doseDate, end: min(doseDate.addingTimeInterval(delta), endDate))
+            let segmentWidth = doseDuration > 0 ? deltaInterval.duration / doseDuration : 1
+            value += segmentWidth * (1.0 - model.percentEffectRemaining(after: DateInterval(start: startDate, duration: max(date.timeIntervalSince(doseDate), 0))))
+            doseDate = doseDate.addingTimeInterval(delta)
+        } while doseDate <= min(date.addingTimeInterval(model.base.delay).dateFlooredToTimeInterval(delta), endDate)
 
         return value
     }
 
-    func glucoseEffect(at date: Date, model: InsulinModel, insulinSensitivity: Double, delta: TimeInterval) -> Double {
-        let time = date.timeIntervalSince(startDate)
-
-        guard time >= 0 else {
+    func glucoseEffect(at date: Date, model: VariableInsulinModel, insulinSensitivity: Double, delta: TimeInterval) -> Double {
+        guard date.timeIntervalSince(startDate) >= 0 else {
             return 0
         }
 
         // Consider doses within the delta time window as momentary
         if endDate.timeIntervalSince(startDate) <= 1.05 * delta {
-            return netBasalUnits * -insulinSensitivity * (1.0 - model.percentEffectRemaining(at: time))
+            return netBasalUnits * -insulinSensitivity * (1.0 - model.percentEffectRemaining(after: DateInterval(start: startDate, end: date)))
         } else {
             return netBasalUnits * -insulinSensitivity * continuousDeliveryGlucoseEffect(at: date, model: model, delta: delta)
         }
@@ -291,7 +295,7 @@ extension DoseEntry {
     ///   - basalRateSchedule: The schedule of basal rates
     /// - Returns: An array of glucose effects for the duration of the temp basal dose plus the duration of insulin action
     public func tempBasalGlucoseEffects(
-        insulinModel: InsulinModel,
+        insulinModel: VariableInsulinModel,
         insulinSensitivity: InsulinSensitivitySchedule,
         basalRateSchedule: BasalRateSchedule
         ) -> [GlucoseEffect] {
@@ -456,12 +460,12 @@ extension Collection where Element == DoseEntry {
      - returns: A sequence of insulin amount remaining
      */
     func insulinOnBoard(
-        model: InsulinModel,
+        model: VariableInsulinModel,
         from start: Date? = nil,
         to end: Date? = nil,
         delta: TimeInterval = TimeInterval(minutes: 5)
     ) -> [InsulinValue] {
-        guard let (start, end) = LoopMath.simulationDateRangeForSamples(self, from: start, to: end, duration: model.effectDuration, delta: delta) else {
+        guard let (start, end) = LoopMath.simulationDateRangeForSamples(self, from: start, to: end, duration: model.base.effectDuration, delta: delta) else {
             return []
         }
 
@@ -490,7 +494,7 @@ extension Collection where Element == DoseEntry {
     ///   - delta: The interval between returned effects
     /// - Returns: An array of glucose effects for the duration of the doses
     public func glucoseEffects(
-        insulinModel: InsulinModel,
+        insulinModel: VariableInsulinModel,
         insulinSensitivity: InsulinSensitivitySchedule,
         from start: Date? = nil,
         to end: Date? = nil,
@@ -498,7 +502,7 @@ extension Collection where Element == DoseEntry {
     ) -> [GlucoseEffect] {
         guard let (start, end) = LoopMath.simulationDateRangeForSamples(self.filter({ entry in
             entry.netBasalUnits != 0
-        }), from: start, to: end, duration: insulinModel.effectDuration, delta: delta) else {
+        }), from: start, to: end, duration: insulinModel.base.effectDuration, delta: delta) else {
             return []
         }
 
