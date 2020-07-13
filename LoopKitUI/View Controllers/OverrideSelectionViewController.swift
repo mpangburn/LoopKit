@@ -23,15 +23,24 @@ public final class OverrideSelectionViewController: UICollectionViewController, 
 
     public var scheduledOverride: TemporaryScheduleOverride?
 
-    public var presets: [TemporaryScheduleOverridePreset] = [] {
+    public func setPresets(_ presets: [TemporaryScheduleOverridePreset]) {
+        presetsByRole = presets.reduce(into: [:]) { result, preset in
+            result[preset.settings.role, default: []].append(preset)
+        }
+    }
+
+    private var presetsByRole: [TemporaryScheduleOverrideSettings.Role: [TemporaryScheduleOverridePreset]] = [:] {
         didSet {
             delegate?.overrideSelectionViewController(self, didUpdatePresets: presets)
         }
     }
 
+    private var presets: [TemporaryScheduleOverridePreset] {
+        TemporaryScheduleOverrideSettings.Role.allCases.flatMap { presetsByRole[$0] ?? [] }
+    }
+
     public weak var delegate: OverrideSelectionViewControllerDelegate?
 
-    private lazy var saveButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewPreset))
     private lazy var editButton = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(beginEditing))
     private lazy var doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(endEditing))
     private lazy var cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(cancel))
@@ -41,7 +50,7 @@ public final class OverrideSelectionViewController: UICollectionViewController, 
 
         title = LocalizedString("Temporary Override", comment: "The title for the override selection screen")
         collectionView?.backgroundColor = .groupTableViewBackground
-        navigationItem.rightBarButtonItems = [saveButton, editButton]
+        navigationItem.rightBarButtonItem = editButton
         navigationItem.leftBarButtonItem = cancelButton
     }
 
@@ -51,7 +60,8 @@ public final class OverrideSelectionViewController: UICollectionViewController, 
 
     enum Section: Int, CaseIterable {
         case scheduledOverride = 0
-        case presets
+        case exercisePresets
+        case standardPresets
     }
 
     private var sections: [Section] {
@@ -62,10 +72,6 @@ public final class OverrideSelectionViewController: UICollectionViewController, 
         return sections
     }
 
-    private var presetSection: Int {
-        sections.firstIndex(of: .presets)!
-    }
-
     private func section(for sectionIndex: Int) -> Section {
         return sections[sectionIndex]
     }
@@ -73,7 +79,7 @@ public final class OverrideSelectionViewController: UICollectionViewController, 
     private enum CellContent {
         case scheduledOverride(TemporaryScheduleOverride)
         case preset(TemporaryScheduleOverridePreset)
-        case customOverride
+        case customOverride(role: TemporaryScheduleOverrideSettings.Role)
     }
 
     private func cellContent(for indexPath: IndexPath) -> CellContent {
@@ -83,19 +89,26 @@ public final class OverrideSelectionViewController: UICollectionViewController, 
                 preconditionFailure("`sections` must contain `.scheduledOverride`")
             }
             return .scheduledOverride(scheduledOverride)
-        case .presets:
-            if presets.indices.contains(indexPath.row) {
-                return .preset(presets[indexPath.row])
+        case .exercisePresets:
+            if let exercisePresets = presetsByRole[.exercise], exercisePresets.indices.contains(indexPath.row) {
+                return .preset(exercisePresets[indexPath.row])
             } else {
-                return .customOverride
+                return .customOverride(role: .exercise)
+            }
+        case .standardPresets:
+            if let standardPresets = presetsByRole[.standard], standardPresets.indices.contains(indexPath.row) {
+                return .preset(standardPresets[indexPath.row])
+            } else {
+                return .customOverride(role: .standard)
             }
         }
     }
 
-    private func indexPathOfCustomOverride() -> IndexPath {
-        let section = sections.firstIndex(of: .presets)!
-        let row = self.collectionView(collectionView, numberOfItemsInSection: section) - 1
-        return IndexPath(row: row, section: section)
+    private var indexPathsOfCustomOverride: [IndexPath] {
+        [
+            IndexPath(row: presetsByRole[.exercise, default: []].endIndex - 1, section: sections.firstIndex(of: .exercisePresets)!),
+            IndexPath(row: presetsByRole[.standard, default: []].endIndex - 1, section: sections.firstIndex(of: .standardPresets)!),
+        ]
     }
 
     public override func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -106,9 +119,12 @@ public final class OverrideSelectionViewController: UICollectionViewController, 
         switch self.section(for: section) {
         case .scheduledOverride:
             return 1
-        case .presets:
+        case .exercisePresets:
             // +1 for custom override
-            return presets.count + 1 
+            return (presetsByRole[.exercise]?.count ?? 0) + 1
+        case .standardPresets:
+            // +1 for custom override
+            return (presetsByRole[.standard]?.count ?? 0) + 1
         }
     }
 
@@ -119,14 +135,18 @@ public final class OverrideSelectionViewController: UICollectionViewController, 
             switch section(for: indexPath.section) {
             case .scheduledOverride:
                 header.titleLabel.text = LocalizedString("SCHEDULED OVERRIDE", comment: "The section header text for a scheduled override")
-            case .presets:
-                header.titleLabel.text = LocalizedString("PRESETS", comment: "The section header text override presets")
+            case .exercisePresets:
+                header.titleLabel.text = LocalizedString("EXERCISE PRESETS", comment: "The section header text override presets")
+                header.onAdd { [unowned self] in
+                    self.addNewPreset(role: .exercise)
+                }
+            case .standardPresets:
+                header.titleLabel.text = LocalizedString("OTHER PRESETS", comment: "The section header text override presets")
+                header.onAdd { [unowned self] in
+                    self.addNewPreset(role: .standard)
+                }
             }
             return header
-        case UICollectionView.elementKindSectionFooter:
-            let footer = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: OverrideSelectionFooterView.className, for: indexPath) as! OverrideSelectionFooterView
-            footer.textLabel.text = LocalizedString("Tap '+' to create a new override preset.", comment: "Text directing the user to configure their first override preset")
-            return footer
         default:
             fatalError("Unexpected supplementary element kind \(kind)")
         }
@@ -248,18 +268,18 @@ public final class OverrideSelectionViewController: UICollectionViewController, 
                 let override = preset.createOverride(enactTrigger: .local)
                 delegate?.overrideSelectionViewController(self, didConfirmOverride: override)
                 dismiss(animated: true)
-            case .customOverride:
+            case .customOverride(role: let role):
                 let customOverrideVC = AddEditOverrideTableViewController(glucoseUnit: glucoseUnit)
-                customOverrideVC.inputMode = .customOverride
+                customOverrideVC.inputMode = .customOverride(role: role)
                 customOverrideVC.delegate = self
                 show(customOverrideVC, sender: collectionView.cellForItem(at: indexPath))
             }
         }
     }
 
-    @objc private func addNewPreset() {
+    private func addNewPreset(role: TemporaryScheduleOverrideSettings.Role) {
         let addVC = AddEditOverrideTableViewController(glucoseUnit: glucoseUnit)
-        addVC.inputMode = .newPreset
+        addVC.inputMode = .newPreset(role: role)
         addVC.delegate = self
 
         let navigationWrapper = UINavigationController(rootViewController: addVC)
@@ -268,14 +288,13 @@ public final class OverrideSelectionViewController: UICollectionViewController, 
 
     private var isEditingPresets = false {
         didSet {
-            saveButton.isEnabled = !isEditingPresets
             cancelButton.isEnabled = !isEditingPresets
         }
     }
 
     @objc private func beginEditing() {
         isEditingPresets = true
-        navigationItem.setRightBarButtonItems([saveButton, doneButton], animated: true)
+        navigationItem.setRightBarButton(doneButton, animated: true)
         configureCellsForEditingChanged()
 
         if let scheduledOverrideSection = sections.firstIndex(of: .scheduledOverride) {
@@ -287,14 +306,14 @@ public final class OverrideSelectionViewController: UICollectionViewController, 
             scheduledOverrideCell.applyOverlayToFade(animated: true)
         }
 
-        if let customOverrideCell = collectionView.cellForItem(at: indexPathOfCustomOverride()) as? CustomOverrideCollectionViewCell {
-            customOverrideCell.applyOverlayToFade(animated: true)
-        }
+        indexPathsOfCustomOverride
+            .compactMap { collectionView.cellForItem(at: $0) as? CustomOverrideCollectionViewCell }
+            .forEach { $0.applyOverlayToFade(animated: true) }
     }
 
     @objc private func endEditing() {
         isEditingPresets = false
-        navigationItem.setRightBarButtonItems([saveButton, editButton], animated: true)
+        navigationItem.setRightBarButton(editButton, animated: true)
         configureCellsForEditingChanged()
 
         if let scheduledOverrideSection = sections.firstIndex(of: .scheduledOverride) {
@@ -306,13 +325,13 @@ public final class OverrideSelectionViewController: UICollectionViewController, 
             scheduledOverrideCell.removeOverlay(animated: true)
         }
 
-        if let customOverrideCell = collectionView.cellForItem(at: indexPathOfCustomOverride()) as? CustomOverrideCollectionViewCell {
-            customOverrideCell.removeOverlay(animated: true)
-        }
+        indexPathsOfCustomOverride
+            .compactMap { collectionView.cellForItem(at: $0) as? CustomOverrideCollectionViewCell }
+            .forEach { $0.removeOverlay(animated: true) }
     }
 
     private func configureCellsForEditingChanged() {
-        for indexPath in collectionView.indexPathsForVisibleItems where indexPath.section == presetSection {
+        for indexPath in collectionView.indexPathsForVisibleItems where section(for: indexPath.section) != .scheduledOverride {
             if let cell = collectionView.cellForItem(at: indexPath) as? OverridePresetCollectionViewCell {
                 if isEditingPresets {
                     cell.configureForEditing(animated: true)
@@ -338,22 +357,42 @@ public final class OverrideSelectionViewController: UICollectionViewController, 
 
     public override func collectionView(_ collectionView: UICollectionView, canMoveItemAt indexPath: IndexPath) -> Bool {
         isEditingPresets
-            && indexPath.section == presetSection
-            && indexPath != indexPathOfCustomOverride()
+            && indexPath.section != sections.firstIndex(of: .scheduledOverride)
+            && !indexPathsOfCustomOverride.contains(indexPath)
 
     }
 
     public override func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        let movedPreset = presets.remove(at: sourceIndexPath.row)
-        presets.insert(movedPreset, at: destinationIndexPath.row)
+        var movedPreset: TemporaryScheduleOverridePreset
+        switch section(for: sourceIndexPath.section) {
+        case .scheduledOverride:
+            assertionFailure("Cannot move item from `scheduledOverride` section")
+            return
+        case .exercisePresets:
+            movedPreset = presetsByRole[.exercise]!.remove(at: sourceIndexPath.row)
+        case .standardPresets:
+            movedPreset = presetsByRole[.standard]!.remove(at: sourceIndexPath.row)
+        }
+
+        switch section(for: destinationIndexPath.section) {
+        case .scheduledOverride:
+            assertionFailure("Cannot move item to `scheduledOverride` section")
+            return
+        case .exercisePresets:
+            movedPreset.settings.role = .exercise
+            presetsByRole[.exercise]!.insert(movedPreset, at: destinationIndexPath.row)
+        case .standardPresets:
+            movedPreset.settings.role = .standard
+            presetsByRole[.standard]!.insert(movedPreset, at: destinationIndexPath.row)
+        }
     }
 
     public override func collectionView(_ collectionView: UICollectionView, targetIndexPathForMoveFromItemAt originalIndexPath: IndexPath, toProposedIndexPath proposedIndexPath: IndexPath) -> IndexPath {
-        guard proposedIndexPath.section == sections.firstIndex(of: .presets) else {
+        guard proposedIndexPath.section != sections.firstIndex(of: .scheduledOverride) else {
             return originalIndexPath
         }
 
-        return proposedIndexPath == indexPathOfCustomOverride()
+        return indexPathsOfCustomOverride.contains(originalIndexPath)
             ? originalIndexPath
             : proposedIndexPath
 
@@ -366,8 +405,7 @@ extension OverrideSelectionViewController: UICollectionViewDelegateFlowLayout {
     }
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
-        guard presets.isEmpty else { return .zero }
-        return CGSize(width: collectionView.frame.width, height: 50)
+        .zero
     }
 
     public func collectionView(
@@ -408,12 +446,27 @@ extension OverrideSelectionViewController: UICollectionViewDelegateFlowLayout {
 extension OverrideSelectionViewController: AddEditOverrideTableViewControllerDelegate {
     public func addEditOverrideTableViewController(_ vc: AddEditOverrideTableViewController, didSavePreset preset: TemporaryScheduleOverridePreset) {
         if let selectedIndexPath = collectionView.indexPathsForSelectedItems?.first {
-            presets[selectedIndexPath.row] = preset
+            switch section(for: selectedIndexPath.section) {
+            case .scheduledOverride:
+                assertionFailure("Unreachable: no presets available for editing in `scheduledOverride` section")
+            case .exercisePresets:
+                presetsByRole[.exercise]![selectedIndexPath.row] = preset
+            case .standardPresets:
+                presetsByRole[.standard]![selectedIndexPath.row] = preset
+            }
             collectionView.reloadItems(at: [selectedIndexPath])
             collectionView.deselectItem(at: selectedIndexPath, animated: true)
         } else {
-            presets.append(preset)
-            collectionView.insertItems(at: [IndexPath(row: presets.endIndex - 1, section: presetSection)])
+            let newIndexPath: IndexPath
+            switch preset.settings.role {
+            case .exercise:
+                presetsByRole[.exercise, default: []].append(preset)
+                newIndexPath = IndexPath(row: presetsByRole[.exercise]!.endIndex - 1, section: sections.firstIndex(of: .exercisePresets)!)
+            case .standard:
+                presetsByRole[.standard, default: []].append(preset)
+                newIndexPath = IndexPath(row: presetsByRole[.standard]!.endIndex - 1, section: sections.firstIndex(of: .standardPresets)!)
+            }
+            collectionView.insertItems(at: [newIndexPath])
             delegate?.overrideSelectionViewController(self, didUpdatePresets: presets)
         }
     }
@@ -455,7 +508,14 @@ extension OverrideSelectionViewController: OverridePresetCollectionViewCellDeleg
             return
         }
 
-        presets.remove(at: indexPath.row)
+        switch section(for: indexPath.section) {
+        case .scheduledOverride:
+            assertionFailure("No preset to delete in `scheduledOverride` section")
+        case .exercisePresets:
+            presetsByRole[.exercise]!.remove(at: indexPath.row)
+        case .standardPresets:
+            presetsByRole[.standard]!.remove(at: indexPath.row)
+        }
         collectionView.deleteItems(at: [indexPath])
     }
 }

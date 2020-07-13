@@ -34,11 +34,11 @@ public final class AddEditOverrideTableViewController: UITableViewController {
     // MARK: - Public configuration API
 
     public enum InputMode {
-        case newPreset                                                  // Creating a new preset
-        case editPreset(TemporaryScheduleOverridePreset)                // Editing an existing preset
-        case customizePresetOverride(TemporaryScheduleOverridePreset)   // Defining an override relative to an existing preset
-        case customOverride                                             // Defining a one-off custom override
-        case editOverride(TemporaryScheduleOverride)                    // Editing an active override
+        case newPreset(role: TemporaryScheduleOverrideSettings.Role)      // Creating a new preset
+        case editPreset(TemporaryScheduleOverridePreset)                  // Editing an existing preset
+        case customizePresetOverride(TemporaryScheduleOverridePreset)     // Defining an override relative to an existing preset
+        case customOverride(role: TemporaryScheduleOverrideSettings.Role) // Defining a one-off custom override
+        case editOverride(TemporaryScheduleOverride)                      // Editing an active override
     }
 
     public enum DismissalMode {
@@ -46,27 +46,29 @@ public final class AddEditOverrideTableViewController: UITableViewController {
         case popViewController
     }
 
-    public var inputMode: InputMode = .newPreset {
+    public var inputMode: InputMode = .newPreset(role: .standard) {
         didSet {
             switch inputMode {
-            case .newPreset:
+            case .newPreset(role: let newPresetRole):
                 symbol = nil
                 name = nil
                 targetRange = nil
                 insulinNeedsScaleFactor = 1.0
                 duration = .finite(.defaultOverrideDuration)
+                role = newPresetRole
             case .editPreset(let preset), .customizePresetOverride(let preset):
                 symbol = preset.symbol
                 name = preset.name
                 configure(with: preset.settings)
                 duration = preset.duration
-            case .customOverride:
+            case .customOverride(role: let customOverrideRole):
                 symbol = nil
                 name = nil
                 targetRange = nil
                 insulinNeedsScaleFactor = 1.0
                 startDate = Date()
                 duration = .finite(.defaultOverrideDuration)
+                role = customOverrideRole
             case .editOverride(let override):
                 if case .preset(let preset) = override.context {
                     symbol = preset.symbol
@@ -103,6 +105,8 @@ public final class AddEditOverrideTableViewController: UITableViewController {
     private var startDate = Date()
 
     private var duration: TemporaryScheduleOverride.Duration = .finite(.defaultOverrideDuration)
+
+    private var role: TemporaryScheduleOverrideSettings.Role = .standard
     
     private var syncIdentifier = UUID()
     
@@ -124,6 +128,7 @@ public final class AddEditOverrideTableViewController: UITableViewController {
             targetRange = nil
         }
         insulinNeedsScaleFactor = settings.effectiveInsulinNeedsScaleFactor
+        role = settings.role
     }
 
     // MARK: - Initialization & view life cycle
@@ -459,7 +464,8 @@ extension AddEditOverrideTableViewController {
         return TemporaryScheduleOverrideSettings(
             unit: glucoseUnit,
             targetRange: targetRange,
-            insulinNeedsScaleFactor: insulinNeedsScaleFactor == 1.0 ? nil : insulinNeedsScaleFactor
+            insulinNeedsScaleFactor: insulinNeedsScaleFactor == 1.0 ? nil : insulinNeedsScaleFactor,
+            role: role
         )
     }
 

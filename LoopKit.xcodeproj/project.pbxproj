@@ -343,7 +343,6 @@
 		895FE08022011F0C00FCF18A /* EmojiDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895FE07322011F0B00FCF18A /* EmojiDataSource.swift */; };
 		895FE08122011F0C00FCF18A /* OverridePresetCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895FE07422011F0B00FCF18A /* OverridePresetCollectionViewCell.swift */; };
 		895FE08222011F0C00FCF18A /* LabeledTextFieldTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895FE07522011F0B00FCF18A /* LabeledTextFieldTableViewCell.swift */; };
-		895FE08322011F0C00FCF18A /* OverrideSelectionFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895FE07622011F0B00FCF18A /* OverrideSelectionFooterView.swift */; };
 		895FE08622011F0C00FCF18A /* DecimalTextFieldTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 895FE07922011F0B00FCF18A /* DecimalTextFieldTableViewCell.xib */; };
 		895FE08722011F0C00FCF18A /* EmojiInputCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895FE07A22011F0C00FCF18A /* EmojiInputCell.swift */; };
 		895FE08822011F0C00FCF18A /* DoubleRangeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895FE07B22011F0C00FCF18A /* DoubleRangeTableViewCell.swift */; };
@@ -1089,7 +1088,6 @@
 		895FE07322011F0B00FCF18A /* EmojiDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmojiDataSource.swift; sourceTree = "<group>"; };
 		895FE07422011F0B00FCF18A /* OverridePresetCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OverridePresetCollectionViewCell.swift; sourceTree = "<group>"; };
 		895FE07522011F0B00FCF18A /* LabeledTextFieldTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabeledTextFieldTableViewCell.swift; sourceTree = "<group>"; };
-		895FE07622011F0B00FCF18A /* OverrideSelectionFooterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OverrideSelectionFooterView.swift; sourceTree = "<group>"; };
 		895FE07922011F0B00FCF18A /* DecimalTextFieldTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DecimalTextFieldTableViewCell.xib; sourceTree = "<group>"; };
 		895FE07A22011F0C00FCF18A /* EmojiInputCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmojiInputCell.swift; sourceTree = "<group>"; };
 		895FE07B22011F0C00FCF18A /* DoubleRangeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DoubleRangeTableViewCell.swift; sourceTree = "<group>"; };
@@ -1397,7 +1395,6 @@
 				892A5DB12231E191008961AB /* LevelMaskView.swift */,
 				892A5DAF2231E191008961AB /* LoadingTableViewCell.swift */,
 				895FE07422011F0B00FCF18A /* OverridePresetCollectionViewCell.swift */,
-				895FE07622011F0B00FCF18A /* OverrideSelectionFooterView.swift */,
 				895FE07C22011F0C00FCF18A /* OverrideSelectionHeaderView.swift */,
 				4369F08E208859E6000E3E45 /* PaddedTextField.swift */,
 				43D8FE0A1C7290530073BE78 /* RepeatingScheduleValueTableViewCell.swift */,
@@ -2494,7 +2491,6 @@
 				895FE08B22011F0C00FCF18A /* EmojiInputHeaderView.swift in Sources */,
 				43BA7170201E49220058961E /* FoodTypeShortcutCell.swift in Sources */,
 				432CF86520D7692E0066B889 /* DeliveryLimitSettingsTableViewController.swift in Sources */,
-				895FE08322011F0C00FCF18A /* OverrideSelectionFooterView.swift in Sources */,
 				4369F08F208859E6000E3E45 /* PaddedTextField.swift in Sources */,
 				892A5D9E2231E122008961AB /* StateColorPalette.swift in Sources */,
 				895FE08022011F0C00FCF18A /* EmojiDataSource.swift in Sources */,

@@ -1443,7 +1443,9 @@ extension DoseStore {
 extension TemporaryScheduleOverrideHistory {
     public func variableInsulinEffectTimeline(relativeTo interval: DateInterval) -> [(interval: DateInterval, rate: Double)] {
         overridesReflectingEnabledDuration(relativeTo: interval).compactMap { override in
-            guard override.settings.effectiveInsulinNeedsScaleFactor <= 1 else {
+            guard override.settings.role == .exercise,
+                override.settings.effectiveInsulinNeedsScaleFactor <= 1
+            else {
                 return nil
             }
 

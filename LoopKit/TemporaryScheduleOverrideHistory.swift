@@ -193,14 +193,17 @@ public final class TemporaryScheduleOverrideHistory {
     }
 
     func overridesReflectingEnabledDuration(relativeTo referencePeriod: DateInterval) -> [TemporaryScheduleOverride] {
-        var overrides = recentEvents.filter({$0.end != .deleted}).map { event -> TemporaryScheduleOverride in
-            var override = event.override
-            if case .early(let endDate) = event.end {
-                override.endDate = endDate
-            }
-            return override
-        }
         let period = relevantPeriod(relativeTo: referencePeriod)
+        var overrides = recentEvents
+            .filter { $0.end != .deleted && $0.override.activeInterval.intersects(period) }
+            .map { event -> TemporaryScheduleOverride in
+                var override = event.override
+                if case .early(let endDate) = event.end {
+                    override.endDate = endDate
+                }
+                return override
+            }
+
         overrides.mutateEach { override in
             // Save the actual (computed) end date prior to modifying the start date, which shifts the whole interval
             let end = override.endDate
