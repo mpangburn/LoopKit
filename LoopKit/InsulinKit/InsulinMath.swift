@@ -19,7 +19,7 @@ extension DoseEntry {
         repeat {
             let deltaInterval = DateInterval(start: doseDate, end: min(doseDate.addingTimeInterval(delta), endDate))
             let segmentWidth = doseDuration > 0 ? deltaInterval.duration / doseDuration : 1
-            iob += segmentWidth * model.percentEffectRemaining(after: DateInterval(start: startDate, duration: max(date.timeIntervalSince(doseDate), 0)))
+            iob += segmentWidth * percentEffectRemaining(at: date.timeIntervalSince(doseDate), using: model)
             doseDate = doseDate.addingTimeInterval(delta)
         } while doseDate <= min(date.addingTimeInterval(model.base.delay).dateFlooredToTimeInterval(delta), endDate)
 
@@ -33,42 +33,21 @@ extension DoseEntry {
 
         // Consider doses within the delta time window as momentary
         if endDate.timeIntervalSince(startDate) <= 1.05 * delta {
-            return netBasalUnits * model.percentEffectRemaining(after: DateInterval(start: startDate, end: date))
+            return netBasalUnits * percentEffectRemaining(at: date.timeIntervalSince(startDate), using: model)
         } else {
             return netBasalUnits * continuousDeliveryInsulinOnBoard(at: date, model: model, delta: delta)
         }
     }
 
     private func continuousDeliveryGlucoseEffect(at date: Date, model: VariableInsulinModel, delta: TimeInterval) -> Double {
-//        let doseDuration = endDate.timeIntervalSince(startDate)  // t1
-//        let time = date.timeIntervalSince(startDate)
-//        var value: Double = 0
-//        var doseDate = TimeInterval(0)  // i
-//
-//        repeat {
-//            let segment: Double
-//
-//            if doseDuration > 0 {
-//                segment = max(0, min(doseDate + delta, doseDuration) - doseDate) / doseDuration
-//            } else {
-//                segment = 1
-//            }
-//
-//            value += segment * (1.0 - model.percentEffectRemaining(at: time - doseDate))
-//            doseDate += delta
-//        } while doseDate <= min(floor((time + model.delay) / delta) * delta, doseDuration)
-//
-//        return value
-
         let doseDuration = endDate.timeIntervalSince(startDate)  // t1
         var value: Double = 0
         var doseDate = startDate
 
         repeat {
-            // TODO: is this actually equivalent?
             let deltaInterval = DateInterval(start: doseDate, end: min(doseDate.addingTimeInterval(delta), endDate))
             let segmentWidth = doseDuration > 0 ? deltaInterval.duration / doseDuration : 1
-            value += segmentWidth * (1.0 - model.percentEffectRemaining(after: DateInterval(start: startDate, duration: max(date.timeIntervalSince(doseDate), 0))))
+            value += segmentWidth * (1.0 - percentEffectRemaining(at: date.timeIntervalSince(doseDate), using: model))
             doseDate = doseDate.addingTimeInterval(delta)
         } while doseDate <= min(date.addingTimeInterval(model.base.delay).dateFlooredToTimeInterval(delta), endDate)
 
@@ -82,10 +61,18 @@ extension DoseEntry {
 
         // Consider doses within the delta time window as momentary
         if endDate.timeIntervalSince(startDate) <= 1.05 * delta {
-            return netBasalUnits * -insulinSensitivity * (1.0 - model.percentEffectRemaining(after: DateInterval(start: startDate, end: date)))
+            return netBasalUnits * -insulinSensitivity * (1.0 - percentEffectRemaining(at: date.timeIntervalSince(startDate), using: model))
         } else {
             return netBasalUnits * -insulinSensitivity * continuousDeliveryGlucoseEffect(at: date, model: model, delta: delta)
         }
+    }
+
+    private func percentEffectRemaining(at timeSinceDose: TimeInterval, using model: VariableInsulinModel) -> Double {
+        // Variable insulin absorption should not apply to "negative" dose entries
+        let t = max(timeSinceDose, 0)
+        return netBasalUnits > 0
+            ? model.percentEffectRemaining(after: DateInterval(start: startDate, duration: t))
+            : model.base.percentEffectRemaining(at: t)
     }
 
     func trimmed(from start: Date? = nil, to end: Date? = nil, syncIdentifier: String? = nil) -> DoseEntry {

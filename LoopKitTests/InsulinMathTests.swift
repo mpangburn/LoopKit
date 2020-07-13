@@ -247,6 +247,21 @@ class InsulinMathTests: XCTestCase {
         }
     }
 
+    func testIOBFromNegativeTempBasalWithVariableAbsorption() {
+        let dateFormatter = ISO8601DateFormatter.localTimeDate(timeZone: fixtureTimeZone)
+        let input = loadDoseFixture("negative_basal_dose")
+        let exerciseStart = dateFormatter.date(from: "2015-07-13T12:00:00")!
+        let exercisePeriod = (interval: DateInterval(start: exerciseStart, duration: .hours(1)), rate: 1.5)
+        let baseModel = ExponentialInsulinModel(actionDuration: .minutes(360), peakActivityTime: .minutes(75), delay: .minutes(10))
+        let constantAbsorptionModel = VariableInsulinModel(base: baseModel, variableEffectTimeline: [])
+        let variableAbsorptionModel = VariableInsulinModel(base: baseModel, variableEffectTimeline: [exercisePeriod])
+
+        XCTAssertEqual(
+            input.insulinOnBoard(model: constantAbsorptionModel),
+            input.insulinOnBoard(model: variableAbsorptionModel)
+        )
+    }
+
     func testIOBFromDoses() {
         let input = loadDoseFixture("normalized_doses")
         let output = loadInsulinValueFixture("iob_from_doses_output")
@@ -483,6 +498,20 @@ class InsulinMathTests: XCTestCase {
             XCTAssertEqual(expected.startDate, calculated.startDate)
             XCTAssertEqual(expected.quantity.doubleValue(for: .milligramsPerDeciliter), calculated.quantity.doubleValue(for: .milligramsPerDeciliter), accuracy: Double(Float.ulpOfOne))
         }
+    }
+
+    func testGlucoseEffectFromNegativeTempBasalWithVariableAbsorption() {
+        let dateFormatter = ISO8601DateFormatter.localTimeDate(timeZone: fixtureTimeZone)
+        let input = loadDoseFixture("negative_basal_dose")
+        let exerciseStart = dateFormatter.date(from: "2015-07-13T12:00:00")!
+        let exercisePeriod = (interval: DateInterval(start: exerciseStart, duration: .hours(1)), rate: 1.5)
+        let baseModel = ExponentialInsulinModel(actionDuration: .minutes(360), peakActivityTime: .minutes(75), delay: .minutes(10))
+        let constantAbsorptionModel = VariableInsulinModel(base: baseModel, variableEffectTimeline: [])
+        let variableAbsorptionModel = VariableInsulinModel(base: baseModel, variableEffectTimeline: [exercisePeriod])
+
+        let constantAbsorptionEffects = input.glucoseEffects(insulinModel: constantAbsorptionModel, insulinSensitivity: self.insulinSensitivitySchedule)
+        let variableAbsorptionEffects = input.glucoseEffects(insulinModel: variableAbsorptionModel, insulinSensitivity: self.insulinSensitivitySchedule)
+        XCTAssertEqual(constantAbsorptionEffects, variableAbsorptionEffects, "Negative doses should not exhibit variable insulin absorption rates")
     }
 
     func testGlucoseEffectFromTempBasal() {

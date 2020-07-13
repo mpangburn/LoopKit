@@ -22,37 +22,11 @@ public struct VariableInsulinModel {
     }
 
     func percentEffectRemaining(after interval: DateInterval) -> Double {
-//        1 - percentEffect(over: interval)
-        percentEffectRemaining2(after: interval)
-    }
-
-    private func percentEffectRemaining2(after interval: DateInterval) -> Double {
         let effectiveTime = effectTimeline(over: interval).reduce(into: 0) { effectiveTime, effect in
             effectiveTime += effect.rate * effect.interval.duration
         }
 
-        print(effectiveTime / .minutes(5))
         return base.percentEffectRemaining(at: effectiveTime)
-    }
-
-    private func percentEffect(over interval: DateInterval) -> Double {
-        effectTimeline(over: interval).reduce(into: (
-            totalEffect: 0 as Double,
-            effectiveElapsedTime: 0 as TimeInterval
-        )) { (result: inout (totalEffect: Double, effectiveElapsedTime: Double), effect) in
-            let effectDuration = effect.interval.end.timeIntervalSince(interval.start) - result.effectiveElapsedTime
-            guard effectDuration > 0 else {
-                return
-            }
-            let effectStartTime = result.effectiveElapsedTime
-            let scaledEffectDuration = effect.rate * effectDuration
-            let effectEndTime = effectStartTime + scaledEffectDuration
-            let segment = base.percentEffectRemaining(at: effectStartTime) - base.percentEffectRemaining(at: effectEndTime)
-            result.totalEffect += segment
-            result.effectiveElapsedTime += scaledEffectDuration
-        }
-        .totalEffect
-        .clamped(to: 0...1)
     }
 
     private func effectTimeline(over interval: DateInterval) -> [(interval: DateInterval, rate: Double)] {
