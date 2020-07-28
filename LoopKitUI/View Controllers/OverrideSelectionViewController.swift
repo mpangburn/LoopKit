@@ -380,10 +380,10 @@ public final class OverrideSelectionViewController: UICollectionViewController, 
             return
         case .exercisePresets:
             movedPreset.settings.role = .exercise
-            presetsByRole[.exercise]!.insert(movedPreset, at: destinationIndexPath.row)
+            presetsByRole[.exercise, default: []].insert(movedPreset, at: destinationIndexPath.row)
         case .standardPresets:
             movedPreset.settings.role = .standard
-            presetsByRole[.standard]!.insert(movedPreset, at: destinationIndexPath.row)
+            presetsByRole[.standard, default: []].insert(movedPreset, at: destinationIndexPath.row)
         }
     }
 
