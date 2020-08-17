@@ -1087,9 +1087,9 @@ extension CarbStore {
 }
 
 extension TemporaryScheduleOverrideHistory {
-    func zeroAbsorptionPeriods(affecting interval: DateInterval) -> [DateInterval] {
-        overridesReflectingEnabledDuration(relativeTo: interval)
+    func zeroAbsorptionPeriods(affecting interval: DateInterval, maximumDuration: TimeInterval = .minutes(30)) -> [DateInterval] {
+        return overridesReflectingEnabledDuration(relativeTo: interval)
             .filter { $0.settings.role == .exercise }
-            .map { $0.activeInterval }
+            .map { DateInterval(start: $0.startDate, end: min($0.endDate, $0.startDate.addingTimeInterval(maximumDuration))) }
     }
 }
